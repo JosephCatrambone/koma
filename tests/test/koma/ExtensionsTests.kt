@@ -1,6 +1,5 @@
 package koma
 
-import koma.extensions.*
 import koma.util.test.*
 import org.junit.Test
 
@@ -44,70 +43,6 @@ class ExtensionsTests {
             assertMatrixEquals(expected=exp,
                                actual=a.selectCols(mat[0,3 end
                                                        2,2]))
-        }
-    }
-
-    @Test
-    fun testFilterRows() {
-        allBackends {
-            val a = mat[1, 2, 3, 4 end
-                    5, 6, 7, 8 end
-                    9,10,11,12]
-            val exp = mat[1, 2, 3, 4 end
-                    9,10,11,12]
-
-            assertMatrixEquals(expected=exp,
-                    actual=a.filterRows { it[0] != 5.0 })
-
-        }
-    }
-
-    @Test
-    fun testFilterRowsIndexed() {
-        allBackends {
-            val a = mat[1, 2, 3, 4 end
-                    5, 6, 7, 8 end
-                    9,10,11,12]
-            val exp = mat[5, 6, 7, 8]
-
-            assertMatrixEquals(expected=exp,
-                    actual=a.filterRowsIndexed { idx, row ->
-                        idx != 2 && row[2] != 3.0
-                    })
-        }
-    }
-
-    @Test
-    fun testFilterCols() {
-        allBackends {
-            val a = mat[1, 2,   3, 4 end
-                        5, 6,   7, 8 end
-                        9, 10, 11, 12]
-
-            val exp = mat[1,    3, 4 end
-                          5,    7, 8 end
-                          9,   11, 12]
-
-            assertMatrixEquals(expected=exp,
-                    actual=a.filterCols { it[0] != 2.0 })
-        }
-    }
-
-    @Test
-    fun testFilterColsIndexed() {
-        allBackends {
-            val a = mat[1, 2,   3, 4 end
-                        5, 6,   7, 8 end
-                        9, 10, 11, 12]
-
-            val exp = mat[1,    3 end
-                          5,    7 end
-                          9,   11]
-
-            assertMatrixEquals(expected=exp,
-                    actual=a.filterColsIndexed { idx, col ->
-                        col[0] != 2.0 && idx != 3
-                    })
         }
     }
     

@@ -9,29 +9,9 @@
 
 package koma
 
-import koma.extensions.*
 import koma.matrix.*
 import koma.platformsupport.*
 import koma.polyfill.annotations.*
-
-/**
- * Returns true if all elements are close to equal, as defined by
- * two tolerance values. The matrices are considered equal if
- *
- * abs(ele1 - ele2) < (atol + rtol * abs(ele1))
- *
- * is true elementwise for all elements ele1 in [arr1]
- * and all elements ele2 in [arr2].
- *
- * @param arr1 The first matrix to compare
- * @param arr2 The second matrix to compare
- * @param rtol The relative tolerance value
- * @param atol The absolute tolerance value
- */
-fun allclose(arr1: Matrix<Double>,
-             arr2: Matrix<Double>,
-             rtol: Double = 1e-05,
-             atol: Double = 1e-08) = arr1.allClose(arr2, rtol=rtol, atol=atol)
 
 /**
  * Returns a matrix of the arccos of each element in the input matrix.
@@ -40,7 +20,7 @@ fun allclose(arr1: Matrix<Double>,
  *
  * @return A matrix consisting of the operation performed element-wise.
  */
-fun acos(arr: Matrix<Double>) = arr.map { kotlin.math.acos(it) }
+fun acos(arr: Matrix<Double>) = arr.map { Math.acos(it) }
 
 /**
  * Returns a matrix of the arcsin of each element in the input matrix.
@@ -49,7 +29,7 @@ fun acos(arr: Matrix<Double>) = arr.map { kotlin.math.acos(it) }
  *
  * @return A matrix consisting of the operation performed element-wise.
  */
-fun asin(arr: Matrix<Double>) = arr.map { kotlin.math.asin(it) }
+fun asin(arr: Matrix<Double>) = arr.map { Math.asin(it) }
 
 /**
  * Returns a matrix of the arctan of each element in the input matrix.
@@ -58,7 +38,7 @@ fun asin(arr: Matrix<Double>) = arr.map { kotlin.math.asin(it) }
  *
  * @return A matrix consisting of the operation performed element-wise.
  */
-fun atan(arr: Matrix<Double>) = arr.map { kotlin.math.atan(it) }
+fun atan(arr: Matrix<Double>) = arr.map { Math.atan(it) }
 
 /**
  * Returns a matrix of the absolute value of each element in the input matrix.
@@ -67,7 +47,7 @@ fun atan(arr: Matrix<Double>) = arr.map { kotlin.math.atan(it) }
  *
  * @return A matrix consisting of the operation performed element-wise.
  */
-fun abs(arr: Matrix<Double>) = arr.map { kotlin.math.abs(it) }
+fun abs(arr: Matrix<Double>) = arr.map { Math.abs(it) }
 
 /**
  * Rounds each element to the integer which is nearest to the element and still less than the
@@ -78,7 +58,7 @@ fun abs(arr: Matrix<Double>) = arr.map { kotlin.math.abs(it) }
  * @return A matrix consisting of the operation performed element-wise.
  */
 // explicit toDouble() for javascript
-fun ceil(arr: Matrix<Double>) = arr.map { kotlin.math.ceil(it).toDouble() }
+fun ceil(arr: Matrix<Double>) = arr.map { Math.ceil(it).toDouble() }
 
 /**
  * Returns a matrix of the cos of each element in the input matrix.
@@ -88,7 +68,7 @@ fun ceil(arr: Matrix<Double>) = arr.map { kotlin.math.ceil(it).toDouble() }
  * @return A matrix consisting of the operation performed element-wise.
  *
  */
-fun cos(arr: Matrix<Double>) = arr.map { kotlin.math.cos(it) }
+fun cos(arr: Matrix<Double>) = arr.map { Math.cos(it) }
 
 /**
  * Returns a matrix of E.pow(element) for each element in the input matrix.
@@ -98,8 +78,17 @@ fun cos(arr: Matrix<Double>) = arr.map { kotlin.math.cos(it) }
  * @return A matrix consisting of the operation performed element-wise.
  *
  */
-fun exp(arr: Matrix<Double>) = arr.map { kotlin.math.exp(it) }
+fun exp(arr: Matrix<Double>) = arr.map { Math.exp(it) }
 
+/**
+ * Returns a matrix of the natural logarithm of each element in the input matrix.
+ *
+ * @param arr An arbitrarily sized matrix
+ *
+ * @return A matrix consisting of the operation performed element-wise.
+ *
+ */
+fun log(arr: Matrix<Double>) = arr.map { Math.log(it) }
 
 /**
  * Returns a matrix consisting of each element in the input matrix raised to the given power.
@@ -142,7 +131,7 @@ fun sign(arr: Matrix<Double>) = arr.map { signum(it) }
  * @return A matrix consisting of the operation performed element-wise.
  *
  */
-fun sin(arr: Matrix<Double>) = arr.map { kotlin.math.sin(it) }
+fun sin(arr: Matrix<Double>) = arr.map { Math.sin(it) }
 
 /**
  * Returns a matrix of the sqrt of each element in the input matrix. Does
@@ -153,7 +142,7 @@ fun sin(arr: Matrix<Double>) = arr.map { kotlin.math.sin(it) }
  * @return A matrix consisting of the operation performed element-wise.
  *
  */
-fun sqrt(arr: Matrix<Double>) = arr.map { kotlin.math.sqrt(it) }
+fun sqrt(arr: Matrix<Double>) = arr.map { Math.sqrt(it) }
 
 /**
  * Returns a matrix of the tan of each element in the input matrix
@@ -163,7 +152,7 @@ fun sqrt(arr: Matrix<Double>) = arr.map { kotlin.math.sqrt(it) }
  * @return A matrix consisting of the operation performed element-wise.
  *
  */
-fun tan(arr: Matrix<Double>) = arr.map { kotlin.math.tan(it) }
+fun tan(arr: Matrix<Double>) = arr.map { Math.tan(it) }
 
 /**
  * Rounds each element to the nearest integer value. For elements exactly between integers,
@@ -173,7 +162,7 @@ fun tan(arr: Matrix<Double>) = arr.map { kotlin.math.tan(it) }
  *
  * @return A matrix consisting of the operation performed element-wise.
  */
-fun round(arr: Matrix<Double>) = arr.map { kotlin.math.round(it).toDouble() }
+fun round(arr: Matrix<Double>) = arr.map { Math.round(it).toDouble() }
 
 /**
  * Rounds each element to the integer which is nearest to the element and still less than the
@@ -184,20 +173,7 @@ fun round(arr: Matrix<Double>) = arr.map { kotlin.math.round(it).toDouble() }
  * @return A matrix consisting of the operation performed element-wise.
  */
 // explicit toDouble() for javascript
-fun floor(arr: Matrix<Double>) = arr.map { kotlin.math.floor(it).toDouble() }
-
-/**
- * Returns a matrix of the natural logarithm of each element in the input matrix.
- *
- * @param arr An arbitrarily sized matrix
- *
- * @return A matrix consisting of the operation performed element-wise.
- *
- */
-fun ln(arr: Matrix<Double>) = arr.map { ln(it) }
-
-@Deprecated("Use ln()", ReplaceWith("ln(arr)"))
-fun log(arr: Matrix<Double>) = ln(arr)
+fun floor(arr: Matrix<Double>) = arr.map { Math.floor(it).toDouble() }
 
 /**
  * Returns a matrix of the log-base-b of each element in the input matrix
@@ -208,7 +184,7 @@ fun log(arr: Matrix<Double>) = ln(arr)
  * @return A matrix consisting of the operation performed element-wise.
  *
  */
-fun logb(base: Int, arr: Matrix<Double>) = arr.map { logb(base, it) }
+fun logb(base: Int, arr: Matrix<Double>) = arr.map { Math.log(it) / Math.log(base.toDouble()) }
 
 /**
  * Extracts the diagonal of the matrix.
@@ -279,6 +255,18 @@ fun argMax(arr: Matrix<Double>) = arr.argMax()
  *
  */
 fun argMin(arr: Matrix<Double>) = arr.argMin()
+
+/**
+ * Returns the L2 norm of the input vector for vectors.
+ *
+ * TODO: Generalize this to matrices
+ *
+ * @param arr A Nx1 or 1xN vector
+ *
+ * @return The maximum value
+ *
+ */
+fun norm(arr: Matrix<Double>) = arr.norm()
 
 // Adv funcs
 /**

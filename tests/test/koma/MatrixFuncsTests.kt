@@ -1,32 +1,11 @@
 package koma
 
-import koma.extensions.*
-import koma.matrix.ejml.EJMLMatrixFactory
-import koma.matrix.jblas.JBlasMatrixFactory
-import koma.matrix.mtj.MTJMatrixFactory
 import koma.util.test.*
 import org.junit.Test
 
 //@formatter:off
 
 class MatrixFuncsTests {
-
-    @Test
-    fun testAllClose() {
-        allBackends {
-            val a = mat[1, 2, 3 end
-                    4, 3, -1]
-            val b = mat[1, 2, 3 end
-                    4, 3, -1]
-
-            assert(allclose(a,b))
-            assert(a.allClose(b))
-            assert(allclose(mat[1], mat[1+1e-5]))
-            assert(!allclose(mat[1], mat[1+1e-4]))
-            assert(allclose(mat[1e10], mat[1e10 + 1e-4]))
-            assert(!allclose(mat[1e10], mat[1e10 + 1.001e10]))
-        }
-    }
 
     @Test
     fun testArgMin() {
@@ -170,10 +149,10 @@ class MatrixFuncsTests {
     fun testLog() {
         allBackends {
             val a = mat[3.3, 5.4, 1.1]
-            val expected = a.map { ln(it) }
+            val expected = a.map { log(it) }
             val expected2 = mat[1.19392247, 1.68639895, 0.09531018]
-            assertMatrixEquals(expected, ln(a))
-            assertMatrixEquals(expected2, ln(a))
+            assertMatrixEquals(expected, log(a))
+            assertMatrixEquals(expected2, log(a))
         }
     }
 
@@ -181,8 +160,8 @@ class MatrixFuncsTests {
     fun testLogFail() {
         allBackends {
             val a = mat[3.3, 5.4, -1.1]
-            assertMatrixEquals(mat[ln(3.3), ln(5.4)], ln(a[0, 0..1]))
-            assert(ln(a[2]).equals(Double.NaN))
+            assertMatrixEquals(mat[log(3.3), log(5.4)], log(a[0, 0..1]))
+            assert(log(a[2]).equals(Double.NaN))
         }
     }
 
@@ -220,7 +199,7 @@ class MatrixFuncsTests {
     fun testRound() {
         allBackends {
             val a = mat[1.1, 1.5, 1.6, 1.9, -1.1, -1.5, -1.7]
-            val expected = mat[1, 2, 2, 2, -1, -2, -2]
+            val expected = mat[1, 2, 2, 2, -1, -1, -2]
             assertMatrixEquals(expected, round(a))
         }
     }
@@ -260,51 +239,5 @@ class MatrixFuncsTests {
                            -2, -4, 0, 0 end
                            -6, -8, 0, 0]
         assertMatrixEquals(expected, out)
-    }
-
-    @Test
-    fun testEquals() {
-        allBackends {
-            val a = mat[1, 2 end
-                    3, 4]
-            val b = mat[-1, -2 end
-                    -3, -4]
-            val c = mat[1, 2 end
-                    3, 4]
-
-            assert(a.equals(a))
-            assert(a==a)
-            assert(!a.equals(b))
-            assert(a!=b)
-            assert(a.equals(c))
-            assert(a==c)
-            assert(!a.equals(eye(4)))
-            assert(a!=eye(4))
-            assert(!a.equals(mat[1]))
-            assert(a!=mat[1])
-            assert(a!=5.toBigDecimal())
-        }
-
-        koma.factory = EJMLMatrixFactory()
-        val a = mat[1, 2 end
-                3, 4]
-        koma.factory = MTJMatrixFactory()
-        val b = mat[-1, -2 end
-                -3, -4]
-        koma.factory = JBlasMatrixFactory()
-        val c = mat[1, 2 end
-                3, 4]
-
-        assert(a.equals(a))
-        assert(a==a)
-        assert(!a.equals(b))
-        assert(a!=b)
-        assert(a.equals(c))
-        assert(a==c)
-        assert(!a.equals(eye(4)))
-        assert(a!=eye(4))
-        assert(!a.equals(mat[1]))
-        assert(a!=mat[1])
-        assert(a!=5.toBigDecimal())
     }
 }

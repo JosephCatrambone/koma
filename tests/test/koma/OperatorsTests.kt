@@ -1,10 +1,9 @@
 package koma
 
-import koma.extensions.*
-import koma.matrix.Matrix
-import koma.matrix.ejml.EJMLMatrixFactory
-import koma.matrix.jblas.JBlasMatrixFactory
-import koma.matrix.mtj.MTJMatrixFactory
+import koma.matrix.*
+import koma.matrix.ejml.*
+import koma.matrix.jblas.*
+import koma.matrix.mtj.*
 import koma.util.test.*
 import org.junit.Test
 import org.junit.rules.ExpectedException

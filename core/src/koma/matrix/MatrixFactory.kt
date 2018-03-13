@@ -21,6 +21,13 @@ interface MatrixFactory<out T> {
     fun zeros(rows: Int, cols: Int): T
 
     /**
+     * Generate a zero initialized square matrix of the requested shape.
+     */
+    @Deprecated(DEPRECATE_IMPLICIT_2D)
+    @JsName("zeros__Deprecated")
+    fun zeros(size: Int): T
+
+    /**
      * Creates a row-vector with initial values pulled from an int range, e.g. 1..45
      */
     @JsName("createRange")
@@ -37,6 +44,13 @@ interface MatrixFactory<out T> {
      */
     @JsName("create2DArray")
     fun create(data: Array<DoubleArray>): T
+
+    /**
+     * Creates a one initialized square matrix of the requested shape
+     */
+    @JsName("ones__Deprecated")
+    @Deprecated(DEPRECATE_IMPLICIT_2D)
+    fun ones(size: Int): T
 
     /**
      * Creates a one initialized matrix of the requested shape
@@ -57,16 +71,44 @@ interface MatrixFactory<out T> {
     fun eye(rows: Int, cols: Int): T
 
     /**
+     * Creates a vector of [size] many uniform 0-1 random samples
+     */
+    @JsName("rand__")
+    @Deprecated(DEPRECATE_IMPLICIT_2D)
+    fun rand(size: Int): T
+
+    /**
      * Creates a matrix of uniform 0-1 random samples
      */
     @JsName("rand")
     fun rand(rows: Int, cols: Int): T
 
     /**
+     * Creates a matrix of rows x cols uniform 0-1 samples using the given seed. Two calls with the same seed
+     * will produce identical matrices
+     */
+    @JsName("randSeed")
+    fun rand(rows: Int, cols: Int, seed: Long): T
+
+    /**
+     * Creates a vector of [size] many unit-normal random samples
+     */
+    @JsName("randn__Deprecated")
+    @Deprecated(DEPRECATE_IMPLICIT_2D)
+    fun randn(size: Int): T
+
+    /**
      * Creates a matrix of unit-normal random samples
      */
     @JsName("randn")
     fun randn(rows: Int, cols: Int): T
+
+    /**
+     * Creates a matrix of rows x cols random samples using the given seed. Two calls with the same seed
+     * will produce identical matrices
+     */
+    @JsName("randnSeed")
+    fun randn(rows: Int, cols: Int, seed: Long): T
 
     /**
      * Creates a row-vector with the first value of [start] and the last value of [stop], with [increment] steps

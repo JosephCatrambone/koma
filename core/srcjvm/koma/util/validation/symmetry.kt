@@ -3,7 +3,6 @@
 package koma.util.validation
 
 import koma.*
-import koma.extensions.*
 import koma.polyfill.annotations.*
 
 fun ValidationContext.symmetric(precision: Double = 1e-5): ValidationContext {

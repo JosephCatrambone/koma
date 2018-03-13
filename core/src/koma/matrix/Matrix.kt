@@ -1,7 +1,7 @@
 package koma.matrix
 
 import koma.polyfill.annotations.*
-import koma.extensions.*
+import koma.*
 
 /**
  * A general facade for a Matrix type. Allows for various backend to be
@@ -12,6 +12,8 @@ import koma.extensions.*
  */
 interface Matrix<T> {
     // Algebraic Operators
+    @JsName("rem")
+    operator fun rem(other: Matrix<T>): Matrix<T>
     @JsName("divInt")
     operator fun div(other: Int): Matrix<T>
     @JsName("divScalar")
@@ -29,32 +31,15 @@ interface Matrix<T> {
     operator fun plus(other: T): Matrix<T>
     @JsName("plus")
     operator fun plus(other: Matrix<T>): Matrix<T>
-    /**
-     * Transpose of the matrix
-     */
     fun transpose(): Matrix<T>
-    /**
-     * Element-wise multiplication with another matrix
-     */
     fun elementTimes(other: Matrix<T>): Matrix<T>
-    /**
-     * Element-wise exponentiation of each element in the matrix
-     */
     fun epow(other: T): Matrix<T>
     infix fun epow(other: Int): Matrix<T>
 
-    /**
-     * Number of rows in the matrix
-     */
+    // Dimensions
     fun numRows(): Int
-    /**
-     * Number of columns in the matrix
-     */
     fun numCols(): Int
 
-    /**
-     * Returns a copy of this matrix (same values, new memory)
-     */
     fun copy(): Matrix<T>
 
     // For speed optimized code (if backend isnt chosen type, may throw an exception or incur performance loss)
@@ -108,13 +93,7 @@ interface Matrix<T> {
     @JsName("setRow")
     fun setRow(index: Int, row: Matrix<T>)
 
-    /**
-     * (lower triangular) Cholesky decomposition of the matrix. Matrix must be positive-semi definite.
-     */
     fun chol(): Matrix<T>
-    /**
-     * LU Decomposition. Returns p, l, u matrices as a triple.
-     */
     fun LU(): Triple<Matrix<T>, Matrix<T>, Matrix<T>>
     fun QR(): Pair<Matrix<T>, Matrix<T>>
     fun SVD(): Triple<Matrix<T>, Matrix<T>, Matrix<T>> // Returns U, S, V such that A = U * S * V.T
@@ -122,55 +101,20 @@ interface Matrix<T> {
 
 
     // Advanced Functions
-    /**
-     * Compute the matrix exponential e^x (NOT elementwise)
-     */
     fun expm(): Matrix<T>
     @JsName("solve")
-    /**
-     * Solves A*X=B for X, returning X (X is either column vector or a matrix composed of several col vectors).
-     * A is the current matrix, B is the passed in [other], and X is the returned matrix.
-     */
-    fun solve(other: Matrix<T>): Matrix<T>
+    fun solve(A: Matrix<T>, B: Matrix<T>): Matrix<T>
 
     // Basic Functions
-    /**
-      * Matrix inverse (square matrices)
-      */
     fun inv(): Matrix<T>
-    /**
-     * Determinant of the matrix
-     */
     fun det(): T
-    /**
-     * Pseudo-inverse of (non-square) matrix
-     */
     fun pinv(): Matrix<T>
-    /**
-     * Frobenius normal of the matrix
-     */
     fun normF(): T
-
-    /**
-     * Induced, p=1 normal of the matrix. Equivalent of `norm(matrix,1)` in scipy.
-     */
     fun normIndP1(): T
-    /**
-     * Sum of all the elements in the matrix.
-     */
     fun elementSum(): T
     fun diag(): Matrix<T>
-    /**
-     * Maximum value contained in the matrix
-     */
     fun max(): T // add dimension: Int?
-    /**
-     * Mean (average) of all the elements in the matrix.
-     */
     fun mean(): T
-    /**
-     * Minimum value contained in the matrix
-     */
     fun min(): T
     
     /**
@@ -182,12 +126,14 @@ interface Matrix<T> {
      * Row major 1D index.
      */
     fun argMin(): Int
-
-    /**
-     * The matrix trace.
-     */
+    fun norm(): T // L2 (Euclidean) norm
     fun trace(): T
     
+    /**
+     * Transpose operator.
+     */
+    fun T(): Matrix<T> // In MATLAB, this appears at foo.T
+
     /**
      * Returns the underlying matrix object from the back-end this Matrix is wrapping. This should be used
      * sparingly (as it breaks encapsulation), but it can increase performance by using computation specifically
@@ -203,12 +149,8 @@ interface Matrix<T> {
      */
     fun getFactory(): MatrixFactory<Matrix<T>>
 
-    fun repr(): String = koma.platformsupport.repr(this)
 
-    /**
-     * Transpose operator.
-     */
-    fun T() = transpose()
+    fun repr(): String = koma.platformsupport.repr(this)
 
     /**
      * Transpose operator.
@@ -231,9 +173,6 @@ interface Matrix<T> {
             return MatrixIterator(this@Matrix)
         }
     }
-    /**
-     * Multiplies the matrix by itself [exponent] times (using matrix multiplication).
-     */
     @JsName("pow")
     infix fun pow(exponent: Int): Matrix<T> {
         var out = this.copy()
@@ -249,28 +188,6 @@ interface Matrix<T> {
                 range
             else
                 range.start..(max+range.endInclusive)
-
-    /**
-     * Passes each row from top to bottom into a function.
-     *
-     * @param f A function that takes in a row (i.e. 1xN matrix)
-     */
-    @JsName("forEachRow")
-    fun forEachRow(f: (Matrix<T>) -> Unit) {
-        for (row in 0..this.numRows() - 1)
-            f(this.getRow(row))
-    }
-
-    /**
-     * Passes each col from left to right into a function.
-     *
-     * @param f A function that takes in a row (i.e. 1xN matrix)
-     */
-    @JsName("forEachCol")
-    fun forEachCol(f: (Matrix<T>) -> Unit) {
-        for (col in 0..this.numCols() - 1)
-            f(this.getCol(col))
-    }
 
     /**
      * Select a set of cols from a matrix to form the cols of a new matrix.
@@ -326,6 +243,103 @@ interface Matrix<T> {
         return out
     }
 
+    // TODO: Remove all these superfluous jsnames for 
+    // solo funcs if kotlin-js ever gets less mangle-happy.
+
+    /**
+     * Passes each element in row major order into a function.
+     *
+     * @param f A function that takes in an element
+     *
+     */
+    @JsName("forEach")
+    fun forEach(f: (T) -> Unit) {
+        for (row in 0..this.numRows() - 1)
+            for (col in 0..this.numCols() - 1)
+                f(this[row, col])
+    }
+    @Deprecated("Use forEach", ReplaceWith("forEach(f)"))
+    fun each(f: (T) -> Unit) = forEach(f)
+
+    /**
+     * Passes each element in row major order into a function along with its index location.
+     *
+     * @param f A function that takes in a row,col position and an element value
+     */
+    @JsName("forEachIndexed")
+    fun forEachIndexed(f: (row: Int, col: Int, ele: T) -> Unit) {
+        for (row in 0..this.numRows() - 1)
+            for (col in 0..this.numCols() - 1)
+                f(row, col, this[row, col])
+    }
+    @Deprecated("Use forEachIndexed", ReplaceWith("forEachIndexed(f)"))
+    fun eachIndexed(f: (row: Int, col: Int, ele: T) -> Unit) = forEachIndexed(f)
+
+    /**
+     * Passes each row from top to bottom into a function.
+     *
+     * @param f A function that takes in a row (i.e. 1xN matrix)
+     */
+    @JsName("forEachRow")
+    fun forEachRow(f: (Matrix<T>) -> Unit) {
+        for (row in 0..this.numRows() - 1)
+            f(this.getRow(row))
+    }
+    @Deprecated("Use forEachRow", ReplaceWith("forEachRow(f)"))
+    fun eachRow(f: (Matrix<T>) -> Unit) = forEachRow(f)
+    
+    /**
+     * Passes each col from left to right into a function.
+     *
+     * @param f A function that takes in a row (i.e. 1xN matrix)
+     */
+    @JsName("forEachCol")
+    fun forEachCol(f: (Matrix<T>) -> Unit) {
+        for (col in 0..this.numCols() - 1)
+            f(this.getCol(col))
+    }
+    @Deprecated("Use forEachCol", ReplaceWith("forEachCol(f)"))
+    fun eachCol(f: (Matrix<T>) -> Unit) = forEachCol(f)
+
+
+    /**
+     * Takes each element in a matrix, passes them through f, and puts the output of f into an
+     * output matrix. This process is done in row-major order.
+     *
+     * @param f A function that takes in an element and returns an element
+     *
+     * @return the new matrix after each element is mapped through f
+     */
+    @JsName("map")
+    fun map(f: (T) -> T): Matrix<T> {
+        val out = this.getFactory().zeros(this.numRows(), this.numCols())
+        for (row in 0..this.numRows() - 1)
+            for (col in 0..this.numCols() - 1)
+                out[row, col] = f(this[row, col])
+        return out
+    }
+    @Deprecated("Use map instead", ReplaceWith("map(f)"))
+    fun mapMat(f: (T) -> T): Matrix<T> = map(f)
+
+    /**
+     * Takes each element in a matrix, passes them through f, and puts the output of f into an
+     * output matrix. This process is done in row-major order.
+     *
+     * @param f A function that takes in an element and returns an element. Function also takes
+     *      in the row, col index of the element's location.
+     *
+     * @return the new matrix after each element is mapped through f
+     */
+    @JsName("mapIndexed")
+    fun mapIndexed(f: (row: Int, col: Int, ele: T) -> T): Matrix<T> {
+        val out = this.getFactory().zeros(this.numRows(), this.numCols())
+        for (row in 0..this.numRows() - 1)
+            for (col in 0..this.numCols() - 1)
+                out[row, col] = f(row, col, this[row, col])
+        return out
+    }
+    @Deprecated("Use mapIndexed", ReplaceWith("mapIndexed(f)"))
+    fun mapMatIndexed(f: (row: Int, col: Int, ele: T) -> T): Matrix<T> = mapIndexed(f)
 
     /**
      * Takes each row in a matrix, passes them through f, and puts the output of f into a
@@ -419,6 +433,39 @@ interface Matrix<T> {
     }
 
     /**
+     * Checks to see if any element in the matrix causes f to return true.
+     *
+     * @param f A function which takes in an element from the matrix and returns a Boolean.
+     *
+     * @return Whether or not any element, when passed into f, causes f to return true.
+     */
+    @JsName("any")
+    fun any(f: (T) -> Boolean): Boolean {
+        for (row in 0..this.numRows() - 1)
+            for (col in 0..this.numCols() - 1)
+                if (f(this[row, col]))
+                    return true
+        return false
+    }
+
+    /**
+     * Checks to see if all elements cause f to return true.
+     *
+     * @param f A function which takes in an element from the matrix and returns a Boolean.
+     *
+     * @return Returns true only if f is true for all elements of the input matrix
+     */
+    @JsName("all")
+    fun all(f: (T) -> Boolean): Boolean {
+        for (row in 0..this.numRows() - 1)
+            for (col in 0..this.numCols() - 1)
+                if (!f(this[row, col]))
+                    return false
+        return true
+    }
+
+
+    /**
      * Returns the given vector as a row vector. Will call transpose() on column vectors
      */
     fun asRowVector() = if (this.numRows() != 1 && this.numCols() == 1) this.T else this
@@ -443,47 +490,17 @@ interface Matrix<T> {
     }
 
     /**
-     * Builds a new matrix with a subset of the rows of this matrix, using only the rows
-     * for which the function f returns true.
+     * Fills the matrix with the values returned by the input function.
      *
-     * @param f A function which takes a row index and a row, and returns true if that
-     * row should be included in the output matrix.
+     * @param f A function which takes row,col and returns the value to fill. Note that
+     * the return type must be the matrix primitive type (e.g. Double).
      */
-    fun filterRowsIndexed(f: (rowIndex: Int, row: Matrix<T>) -> Boolean): Matrix<T> {
-        var rowIndex = 0
-        val rowList = mapRowsToList { row -> if (f(rowIndex++, row)) rowIndex - 1 else null }.filterNotNull()
-        return selectRows(*(rowList.toIntArray()))
+    fun fill(f: (row: Int, col: Int) -> T): Matrix<T> {
+        for (row in 0..this.numRows() - 1)
+            for (col in 0..this.numCols() - 1)
+                this[row, col] = f(row, col)
+        return this
     }
 
-    /**
-     * Builds a new matrix with a subset of the rows of this matrix, using only the rows
-     * for which the function f returns true.
-     *
-     * @param f A function which takes a row and returns true if that row should be
-     * be included in the output matrix.
-     */
-    fun filterRows(f: (row: Matrix<T>) -> Boolean) = filterRowsIndexed { n, row -> f(row) }
-
-    /**
-     * Builds a new matrix with a subset of the columns of this matrix, using only the
-     * columns for which the function f returns true.
-     *
-     * @param f A function which takes a column index and a column, and returns true if
-     * that column should be included in the output matrix.
-     */
-    fun filterColsIndexed(f: (colIndex: Int, col: Matrix<T>) -> Boolean): Matrix<T> {
-        var colIndex = 0
-        val colList = mapColsToList { col -> if (f(colIndex++, col)) colIndex - 1 else null }.filterNotNull()
-        return selectCols(*(colList.toIntArray()))
-    }
-
-    /**
-     * Builds a new matrix with a subset of the columns of this matrix, using only the
-     * columns for which the function f returns true.
-     *
-     * @param f A function which takes a column and returns true if that column should
-     * be included in the output matrix.
-     */
-    fun filterCols(f: (col: Matrix<T>) -> Boolean) = filterColsIndexed { n, col -> f(col) }
 }
 

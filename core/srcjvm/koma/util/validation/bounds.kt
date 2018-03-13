@@ -3,7 +3,6 @@
 package koma.util.validation
 import koma.validateMatrices
 import koma.*
-import koma.extensions.*
 import koma.polyfill.annotations.*
 
 /**

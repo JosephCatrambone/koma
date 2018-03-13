@@ -3,7 +3,6 @@ package koma
 import koma.util.test.*
 import org.junit.Test
 import kotlin.test.assertFailsWith
-import koma.extensions.*
 
 class BuildersTests {
 

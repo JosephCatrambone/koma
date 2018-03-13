@@ -1,11 +1,12 @@
 package koma
 
-import koma.extensions.*
+import koma.matrix.*
 import koma.util.test.*
 import org.junit.Assert
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
+import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 
 import koma.matrix.MatrixTypes.DoubleType as dbltype
@@ -135,34 +136,6 @@ class CreatorsTests {
             val b = rand(3, 3)
             val c = rand(3, 3)
             assertFalse { (b-c).any { it == 0.0 } }
-        }
-    }
-
-    @Test
-    fun testSeed() {
-        allBackends {
-            setSeed(4)
-            val a = randn(30,30)
-            val b = randn(30,30)
-            setSeed(4)
-            val c = randn(30,30)
-            val d = randn(30,30)
-            setSeed(5)
-            val e = randn(30,30)
-            val f = randn(30,30)
-
-            assertMatrixEquals(a, c)
-            assertMatrixEquals(b, d)
-
-            assertFalse { allclose(a,b) }
-            assertFalse { allclose(c,d) }
-            assertFalse { allclose(e,f) }
-
-            assertFalse { allclose(a,d) }
-            assertFalse { allclose(b,c) }
-
-            assertFalse { allclose(a,e) }
-            assertFalse { allclose(b,f) }
         }
     }
 }

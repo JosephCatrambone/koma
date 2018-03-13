@@ -14,4 +14,3 @@ node_modules/*
 */srcgen/*
 docs/site
 docs/markdown/Reference*
-*/out/*

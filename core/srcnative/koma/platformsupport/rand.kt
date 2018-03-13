@@ -1,7 +1,8 @@
 package koma.platformsupport
 
 import kotlinx.cinterop.*
-import platform.posix.*
+import Math.log
+import Math.sqrt
 
 var seed: Long? = null
     get() = field
@@ -14,12 +15,12 @@ var seed: Long? = null
 
 
 object rng {
-
+    
     init {
-        srand(time(null).toInt())
+        C.srand(C.time(null).toInt())
     }
     fun setSeed(seed: Int) {
-        srand(seed)
+        C.srand(seed)
     }
     private var spare: Double? = null
     // TODO: Implement ziggurat
@@ -36,8 +37,8 @@ object rng {
         }
         */
         while(true) {
-            val num1 = rand().toDouble()/RAND_MAX * 2 - 1
-            val num2 = rand().toDouble()/RAND_MAX * 2 - 1
+            val num1 = C.rand().toDouble()/C.RAND_MAX * 2 - 1
+            val num2 = C.rand().toDouble()/C.RAND_MAX * 2 - 1
             val cand = num1*num1 + num2*num2
             if (cand < 1.0 && cand != 0.0) {
                 val scale = sqrt((-2 * log(cand))/cand)
@@ -47,6 +48,6 @@ object rng {
         }
     }
     fun nextDouble(): Double {
-        return rand().toDouble()/RAND_MAX
+        return C.rand().toDouble()/C.RAND_MAX
     }
 }
