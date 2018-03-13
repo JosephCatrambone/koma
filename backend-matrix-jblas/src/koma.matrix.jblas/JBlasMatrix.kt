@@ -3,20 +3,18 @@ package koma.matrix.jblas
 import koma.matrix.*
 import koma.matrix.common.*
 import koma.matrix.jblas.backend.*
-import koma.set
+import koma.extensions.*
 import org.jblas.DoubleMatrix
 import org.jblas.Singular
 
 /**
  * An implementation of the Matrix<Double> interface using jBlas.
- * You should rarely use this class directly, instead use one of the
+ * You should rarely construct this class directly, instead make one via the
  * top-level functions in creators.kt (e.g. zeros(5,5)) or [JBlasMatrixFactory].
  */
 
 class JBlasMatrix(var storage: DoubleMatrix) : Matrix<Double>, DoubleMatrixBase() {
     override fun getBaseMatrix() = this.storage
-
-    override fun T() = this.T
 
     override fun normIndP1(): Double {
         throw UnsupportedOperationException()
@@ -30,8 +28,6 @@ class JBlasMatrix(var storage: DoubleMatrix) : Matrix<Double>, DoubleMatrixBase(
     override fun copy() = JBlasMatrix(this.storage.dup())
     override fun epow(other: Double) = JBlasMatrix(this.storage.powElement(other))
     override fun epow(other: Int): Matrix<Double> = JBlasMatrix(this.storage.powElement(other))
-    override fun rem(other: Matrix<Double>) =
-            JBlasMatrix(this.storage.rem(castOrCopy(other, ::JBlasMatrix, getFactory()).storage))
     override fun transpose() = JBlasMatrix(this.storage.transpose())
     override fun div(other: Int) = JBlasMatrix(this.storage.div(other.toDouble()))
     override fun div(other: Double) = JBlasMatrix(this.storage.div(other))
@@ -102,7 +98,7 @@ class JBlasMatrix(var storage: DoubleMatrix) : Matrix<Double>, DoubleMatrixBase(
 
     override fun expm() = JBlasMatrix(this.storage.expm())
 
-    override fun solve(A: Matrix<Double>, B: Matrix<Double>): Matrix<Double> {
+    override fun solve(other: Matrix<Double>): Matrix<Double> {
         throw UnsupportedOperationException()
     }
 
@@ -121,19 +117,11 @@ class JBlasMatrix(var storage: DoubleMatrix) : Matrix<Double>, DoubleMatrixBase(
     override fun argMax() = colToRowMajor(this.storage.argmax())
     override fun argMin() = this.storage.argmin()
 
-    override fun norm(): Double {
-        throw UnsupportedOperationException()
-    }
-
     override fun trace(): Double {
         throw UnsupportedOperationException()
     }
 
     override fun getFactory() = JBlasMatrixFactory()
-
-    override fun repr(): String {
-        throw UnsupportedOperationException()
-    }
 
     /**
      * Gets row-major index from a col-major index.

@@ -9,6 +9,7 @@
 
 package koma
 
+import koma.extensions.*
 import koma.matrix.*
 import koma.polyfill.annotations.*
 
@@ -22,14 +23,6 @@ fun <T> zeros(rows:Int,
               dtype: MatrixType<T>): Matrix<T> 
         = dtype().zeros(rows,cols)
 
-/**
- * Creates a square zero-filled matrix with the given size
- */
-@Deprecated(DEPRECATE_IMPLICIT_2D, ReplaceWith("zeros(size, size)"))
-fun zeros(size: Int): Matrix<Double> = zeros(size, dtype=MatrixTypes.DoubleType)
-fun <T> zeros(size: Int,
-              dtype: MatrixType<T>): Matrix<T>
-        = dtype().zeros(size, size)
 
 /**
  * Creates a matrix filled with the given range of values.
@@ -74,14 +67,6 @@ fun <T> create(data: Array<DoubleArray>,
                dtype: MatrixType<T>): Matrix<T> 
         = dtype().create(data)
 
-/**
- * Creates a one-filled square matrix with the given size
- */
-@Deprecated(DEPRECATE_IMPLICIT_2D, ReplaceWith("ones(size, size)"))
-fun ones(size: Int): Matrix<Double> = ones(size, dtype=MatrixTypes.DoubleType)
-inline fun <reified T> ones(size: Int,
-                            dtype: MatrixType<T>): Matrix<T> 
-        = dtype().ones(size, size)
 
 /**
  * Creates a one-filled matrix with the given size
@@ -136,14 +121,6 @@ fun <T> fill(rows: Int,
              dtype: MatrixType<T>) 
         = zeros(rows, cols, dtype).fill({ _, _ -> value })
 
-/**
- * Creates an 1x[cols] matrix filled with unit uniform random numbers
- */
-@Deprecated(DEPRECATE_IMPLICIT_2D, ReplaceWith("rand(cols, cols)"))
-fun rand(cols: Int): Matrix<Double> = rand(cols, dtype=MatrixTypes.DoubleType)
-fun <T> rand(cols: Int,
-             dtype: MatrixType<T>): Matrix<T> 
-        = dtype().rand(1, cols)
 
 /**
  * Creates an matrix filled with unit uniform random numbers
@@ -160,24 +137,19 @@ fun <T> rand(rows: Int,
  * Subsequent calls with the same seed will produce identical numbers.
  */
 @JsName("randSeed")
-fun rand(rows: Int, cols: Int, seed: Long): Matrix<Double> = rand(rows, 
+@Deprecated("Call setSeed and randn separately")
+fun rand(rows: Int, cols: Int, seed: Long): Matrix<Double> = rand(rows,
                                                                   cols, 
                                                                   seed, 
                                                                   dtype=MatrixTypes.DoubleType)
+@Deprecated("Call setSeed and randn separately")
 fun <T> rand(rows: Int, 
              cols: Int, 
              seed: Long,
-             dtype: MatrixType<T>): Matrix<T> 
-        = dtype().rand(rows, cols, seed)
-
-/**
- * Creates an 1x[cols] matrix filled with unit normal random numbers
- */
-@Deprecated(DEPRECATE_IMPLICIT_2D, ReplaceWith("randn(cols, cols)"))
-fun randn(cols: Int): Matrix<Double> = randn(cols, dtype=MatrixTypes.DoubleType)
-fun <T> randn(cols: Int,
-              dtype: MatrixType<T>): Matrix<T> 
-        = dtype().randn(1, cols)
+             dtype: MatrixType<T>): Matrix<T> {
+    setSeed(seed)
+    return dtype().rand(rows, cols)
+}
 
 /**
  * Creates an matrix filled with unit normal random numbers
@@ -196,15 +168,19 @@ fun <T> randn(rows: Int,
  * Subsequent calls with the same seed will produce identical numbers.
  */
 @JsName("randnSeed")
+@Deprecated("Call setSeed and randn separately")
 fun randn(rows: Int, cols: Int, seed: Long): Matrix<Double> = randn(rows, 
                                                                     cols, 
                                                                     seed, 
                                                                     dtype=MatrixTypes.DoubleType)
-fun <T> randn(rows: Int, 
+@Deprecated("Call setSeed and randn separately")
+fun <T> randn(rows: Int,
               cols: Int, 
               seed: Long,
-              dtype: MatrixType<T>): Matrix<T> 
-        = dtype().randn(rows, cols, seed)
+              dtype: MatrixType<T>): Matrix<T> {
+    setSeed(seed)
+    return dtype().randn(rows, cols)
+}
 
 /**
  * Creates an vector filled in by the given range information. The filled values will start at [start] and
@@ -223,5 +199,4 @@ fun <T> arange(start: Double,
 
 // TODO: Get these versions working
 //fun linspace(...) = factory.linspace(lower, upper, num)
-
 

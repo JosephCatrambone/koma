@@ -1,6 +1,7 @@
 package koma.matrix.default
 
 import koma.*
+import koma.extensions.*
 import koma.matrix.*
 import koma.platformsupport.*
 import koma.polyfill.*
@@ -9,9 +10,6 @@ class Default${dtype}Matrix (val rows: Int,
                           val cols: Int): Matrix<${dtype}> {
     val storage = ${dtype}Array(rows*cols)
 
-    override fun rem(other: Matrix<${dtype}>): Matrix<${dtype}> 
-            = elementTimes(other)
-    
     ${div}
     
     override fun div(other: Int): Matrix<${dtype}>
@@ -56,7 +54,7 @@ class Default${dtype}Matrix (val rows: Int,
     ${epow}
     
     override fun epow(other: Int): Matrix<${dtype}>
-            = this.mapIndexed { _, _, ele -> Math.pow(ele.toDouble(), other.toDouble()).to${dtype}() }
+            = this.mapIndexed { _, _, ele -> pow(ele.toDouble(), other.toDouble()).to${dtype}() }
 
     override fun numRows(): Int = this.rows
     override fun numCols(): Int = this.cols
@@ -145,7 +143,7 @@ class Default${dtype}Matrix (val rows: Int,
         TODO("not implemented")
     }
 
-    override fun solve(A: Matrix<${dtype}>, B: Matrix<${dtype}>): Matrix<${dtype}> {
+    override fun solve(other: Matrix<${dtype}>): Matrix<${dtype}> {
         TODO("not implemented")
     }
 
@@ -201,10 +199,6 @@ class Default${dtype}Matrix (val rows: Int,
                 lowestIdx = i
             }
         return lowestIdx
-    }
-
-    override fun norm(): ${dtype} {
-        TODO("not implemented")
     }
 
     override fun trace(): ${dtype} {
