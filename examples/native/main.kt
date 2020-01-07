@@ -1,7 +1,10 @@
 import koma.*
 import koma.extensions.*
+import koma.matrix.Matrix
+import koma.matrix.cblas.CBlasMatrixFactory
 
 fun main(args: Array<String>) {
+    Matrix.doubleFactory = CBlasMatrixFactory()
 
     val m1 = zeros(3,3)+2
     val m2 = ones(3,3)+3
@@ -56,11 +59,11 @@ fun main(args: Array<String>) {
 
     var a = mat[1,2,3 end
                 4,5,6]
-    
+
     var b = mat[2, 0 end
                 0, 1 end
                -1, 5]
-    
+
     println("a: \n${a.repr()}")
     println("b: \n${b.repr()}")
     println("a*b: \n${(a*b).repr()}")
